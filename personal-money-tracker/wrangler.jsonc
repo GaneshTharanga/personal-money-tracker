@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "personal-money-tracker-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "database_id": "12d82591-27a2-4ba6-a8e4-974543a6a149",
       "migrations_dir": "migrations"
     }
   ]

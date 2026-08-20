@@ -4,8 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import MonthPicker from '@/components/MonthPicker';
 import TransactionModal from '@/components/TransactionModal';
 import { currentMonthISO, formatDate, formatLKR } from '@/lib/money';
+import { useRouter } from 'next/navigation';
 
 export default function TransactionsPage() {
+  const router = useRouter();
   const [month, setMonth] = useState(currentMonthISO());
   const [transactions, setTransactions] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -17,11 +19,12 @@ export default function TransactionsPage() {
     try {
       const response = await fetch(`/api/transactions?month=${month}`, { cache: 'no-store' });
       const data = await response.json();
+      if (response.status === 401) return router.replace('/login');
       if (!response.ok) throw new Error(data.error || 'Could not load transactions.');
       setTransactions(data.transactions);
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
-  }, [month]);
+  }, [month, router]);
 
   useEffect(() => { load(); }, [load]);
 

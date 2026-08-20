@@ -6,8 +6,10 @@ import MonthPicker from '@/components/MonthPicker';
 import TransactionModal from '@/components/TransactionModal';
 import MoneyCharts from '@/components/MoneyCharts';
 import { currentMonthISO, formatDate, formatLKR } from '@/lib/money';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [month, setMonth] = useState(currentMonthISO());
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +22,7 @@ export default function DashboardPage() {
     try {
       const response = await fetch(`/api/dashboard?month=${month}`, { cache: 'no-store' });
       const json = await response.json();
+      if (response.status === 401) return router.replace('/login');
       if (!response.ok) throw new Error(json.error || 'Could not load dashboard.');
       setData(json);
     } catch (err) {
@@ -27,7 +30,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [month]);
+  }, [month, router]);
 
   useEffect(() => { loadDashboard(); }, [loadDashboard]);
 

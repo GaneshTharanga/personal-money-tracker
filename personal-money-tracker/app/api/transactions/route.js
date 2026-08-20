@@ -11,7 +11,7 @@ export async function GET(request) {
   if (month && !validMonth(month)) {
     return NextResponse.json({ error: 'Invalid month. Use YYYY-MM.' }, { status: 400 });
   }
-  return NextResponse.json({ transactions: listTransactions(month || undefined) });
+  return NextResponse.json({ transactions: await listTransactions(month || undefined) });
 }
 
 export async function POST(request) {
@@ -20,7 +20,7 @@ export async function POST(request) {
     if (validation.error) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
-    const transaction = createTransaction(validation.value);
+    const transaction = await createTransaction(validation.value);
     return NextResponse.json({ transaction }, { status: 201 });
   } catch (error) {
     if (error.message === 'INSUFFICIENT_BALANCE') {

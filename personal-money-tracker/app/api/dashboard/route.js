@@ -13,8 +13,12 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Invalid month. Use YYYY-MM.' }, { status: 400 });
   }
 
-  const overall = getOverallTotals();
-  const monthly = getMonthTotals(month);
+  const [overall, monthly, expenseCategories, recentTransactions] = await Promise.all([
+    getOverallTotals(),
+    getMonthTotals(month),
+    getExpenseCategoryTotals(month),
+    getRecentTransactions(),
+  ]);
 
   return NextResponse.json({
     totalAdded: overall.totalAdded,
@@ -22,7 +26,7 @@ export async function GET(request) {
     balance: overall.balance,
     month,
     monthly,
-    expenseCategories: getExpenseCategoryTotals(month),
-    recentTransactions: getRecentTransactions(),
+    expenseCategories,
+    recentTransactions,
   });
 }

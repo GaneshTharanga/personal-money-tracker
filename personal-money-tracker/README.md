@@ -1,6 +1,6 @@
 # Personal Money Tracker
 
-A simple local-first personal wallet tracker built with Next.js and SQLite.
+A personal wallet tracker built with Next.js and Cloudflare D1.
 
 ## Features
 
@@ -17,7 +17,7 @@ A simple local-first personal wallet tracker built with Next.js and SQLite.
 - Edit and delete transactions
 - Month navigation/filtering
 - LKR formatting
-- Local SQLite database
+- Cloudflare D1 database
 - Mobile-friendly UI
 
 ## Linux setup
@@ -41,13 +41,9 @@ chmod +x start-linux-mac.sh
 
 ## Database
 
-The database is automatically created at:
-
-```text
-data/money-tracker.db
-```
-
-The app safely upgrades databases from version 1 by adding the `category` column automatically.
+The schema is managed by the SQL files in `migrations/`. During development,
+Wrangler provides a local D1 database; production uses the D1 database bound as
+`DB` in `wrangler.jsonc`.
 
 Main table:
 
@@ -76,3 +72,42 @@ updated_at
 - `GET /api/dashboard?month=YYYY-MM`
 
 The dashboard response now also includes `expenseCategories` for the selected month.
+
+## Deploy to Cloudflare Workers
+
+You need Node.js 20.9+ and access to the Cloudflare account that will own the app.
+
+1. Install dependencies and sign in:
+
+```bash
+npm install
+npx wrangler login
+```
+
+2. Create the production D1 database:
+
+```bash
+npx wrangler d1 create personal-money-tracker-db
+```
+
+3. Copy the `database_id` printed by that command into `wrangler.jsonc`, replacing
+   `REPLACE_WITH_YOUR_D1_DATABASE_ID`.
+
+4. Create the production tables and deploy:
+
+```bash
+npm run db:migrate:remote
+npm run deploy
+```
+
+Wrangler prints the deployed `workers.dev` URL when deployment finishes.
+
+For a local D1 environment, run:
+
+```bash
+npm run db:migrate:local
+npm run dev
+```
+
+The previous `data/money-tracker.db` file is not uploaded automatically. Keep it
+as a backup until any existing transactions have been imported and verified.
